@@ -1,0 +1,37 @@
+{
+  "name": "insuretrek-playwright",
+  "version": "1.0.0",
+  "description": "Playwright automation tests for InsureTrek application",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+
+    "test:hai-buchwalter": "npx playwright test tests/haiBuchwalterFlow.spec.ts --project=chromium --headed --timeout=120000 --reporter=html,list && npx playwright show-report",
+    "test:hai-buchwalter:headless": "npx playwright test tests/haiBuchwalterFlow.spec.ts --project=chromium --headed --timeout=120000 --reporter=html,list && npx playwright show-report",
+    "test:all": "npx playwright test --project=chromium --headed --timeout=120000",
+    "test:all:headless": "npx playwright test --project=chromium --timeout=120000",
+    "codegen": "npx playwright codegen",
+    "report": "npx playwright show-report",
+    "report:open": "npx playwright show-report --host=0.0.0.0",
+    "clean": "rm -rf test-results playwright-report",
+    "clean:all": "rm -rf test-results playwright-report node_modules package-lock.json"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "insuretrek",
+    "testing"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}
