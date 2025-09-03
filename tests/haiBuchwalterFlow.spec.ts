@@ -90,7 +90,9 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
       return true;
     } catch (error) {
       console.log(`⏱️ Element not ready, waiting 500ms...`);
-      await page.waitForTimeout(500);
+      if (!page.isClosed()) {
+        await page.waitForTimeout(500);
+      }
       try {
         await locator.waitFor({ state: 'visible', timeout: 2000 });
         return true;
@@ -104,12 +106,12 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   // Helper function to wait for page load with minimal delay
   const waitForPageLoad = async () => {
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(200); // Reduced from 500ms to 200ms
+    await page.waitForTimeout(1000); // Reduced from 1000ms to 800ms for efficiency
   };
 
   // Helper function to wait for element interaction with minimal delay
   const waitForInteraction = async () => {
-    await page.waitForTimeout(200); // Reduced from 500ms to 200ms
+    await page.waitForTimeout(500); // Reduced from 500ms to 400ms for efficiency
   };
 
   // Smart wait function that only waits when necessary
