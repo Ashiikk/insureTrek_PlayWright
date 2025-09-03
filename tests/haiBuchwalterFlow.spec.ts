@@ -83,16 +83,16 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   };
 
   // Helper function to wait for element to be visible and clickable
-  const waitForElementReady = async (locator: any, timeout: number = 5000) => {
+  const waitForElementReady = async (locator: any, timeout: number = 3000) => {
     try {
       await locator.waitFor({ state: 'visible', timeout });
-      await locator.waitFor({ state: 'attached', timeout: 3000 });
+      await locator.waitFor({ state: 'attached', timeout: 2000 });
       return true;
     } catch (error) {
-      console.log(`⏱️ Element not ready, waiting 1 second...`);
-      await page.waitForTimeout(1000);
+      console.log(`⏱️ Element not ready, waiting 500ms...`);
+      await page.waitForTimeout(500);
       try {
-        await locator.waitFor({ state: 'visible', timeout: 3000 });
+        await locator.waitFor({ state: 'visible', timeout: 2000 });
         return true;
       } catch (retryError) {
         console.log(`⚠️ Element still not ready after retry`);
@@ -104,12 +104,24 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   // Helper function to wait for page load with minimal delay
   const waitForPageLoad = async () => {
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500); // Reduced from 2000ms
+    await page.waitForTimeout(200); // Reduced from 500ms to 200ms
   };
 
   // Helper function to wait for element interaction with minimal delay
   const waitForInteraction = async () => {
-    await page.waitForTimeout(500); // Reduced from 1000ms
+    await page.waitForTimeout(200); // Reduced from 500ms to 200ms
+  };
+
+  // Smart wait function that only waits when necessary
+  const smartWait = async (condition: () => Promise<boolean>, maxWait: number = 1000) => {
+    const startTime = Date.now();
+    while (Date.now() - startTime < maxWait) {
+      if (await condition()) {
+        return true;
+      }
+      await page.waitForTimeout(100); // Very short wait
+    }
+    return false;
   };
   
   console.log('🚀 Starting Hai Buchwalter Indiana License Management Flow');
@@ -139,14 +151,15 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   console.log(`✅ Step 0: Viewport set to: ${viewportWidth}x${viewportHeight} (90% of available screen)`);
   
   // Wait for viewport to stabilize
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
 
   // 1. Login to InsureTrek
   console.log('📋 Step 1: Login to InsureTrek');
   await page.goto('https://insuretrek.ui.foxsenseprojects.com/');
   
   // Wait for page to load completely
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait 3 seconds before entering credentials
   console.log('⏱️ Step 1a: Waiting 3 seconds before entering credentials...');
@@ -156,17 +169,17 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   const emailInput = page.getByRole('textbox', { name: 'Enter Email address' });
   await waitForElementReady(emailInput);
   await emailInput.click();
-  await waitForInteraction(); // Wait after click
+  await page.waitForTimeout(1000); // Wait after click
   await emailInput.fill('eip+uat@test.com');
-  await waitForInteraction(); // Wait after fill
+  await page.waitForTimeout(1000); // Wait after fill
   
   // Wait for password input to be ready
   const passwordInput = page.getByRole('textbox', { name: 'Password *' });
   await waitForElementReady(passwordInput);
   await passwordInput.click();
-  await waitForInteraction(); // Wait after click
+  await page.waitForTimeout(1000); // Wait after click
   await passwordInput.fill('test@123');
-  await waitForInteraction(); // Wait after fill
+  await page.waitForTimeout(1000); // Wait after fill
   
   // Wait for login button to be ready
   const loginButton = page.getByRole('button', { name: 'Login' });
@@ -176,13 +189,14 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // Wait for login to complete and page to load
   console.log('⏱️ Step 1b: Waiting for login to complete...');
-  await waitForPageLoad();
-  await page.waitForTimeout(2000); // Keep this longer wait for login stability
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(3000);
 
   // 2. Navigate to Home and Manage Producers
   console.log('📋 Step 2: Navigate to Manage Producers');
   await page.goto('https://insuretrek.ui.foxsenseprojects.com/home');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Manage Producers link to be ready
   const manageProducersLink = page.getByText('Manage Producers');
@@ -192,17 +206,18 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
 
   // 3. Search and select Hai Buchwalter
   console.log('📋 Step 3: Search for Hai Buchwalter');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for search combobox to be ready
   const searchCombobox = page.getByRole('combobox', { name: 'Search by Producer or NPN' });
   await waitForElementReady(searchCombobox);
   await searchCombobox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchCombobox.fill('hai buch');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchCombobox.press('Enter');
-  await page.waitForTimeout(1500); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Hai Buchwalter to appear and be clickable
   const haiBuchwalterElement = page.getByText('Hai Buchwalter');
@@ -212,7 +227,8 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
 
   // 4. Click Manage button
   console.log('📋 Step 4: Click Manage button');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready
   const manageButton = page.getByRole('button', { name: 'Manage' });
@@ -222,7 +238,8 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 5. Unassign existing Indiana assignment if present
   console.log('📋 Step 5: Unassign existing Indiana assignment if present');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   try {
     const existingAssignment = page.locator('div').filter({ hasText: /^Aug 26 - 2025$/ }).getByLabel('');
@@ -235,21 +252,21 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 6. Open All States and search for Indiana
   console.log('📋 Step 6: Open All States and search for Indiana');
-  await waitForInteraction(); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for All States to be ready
   const allStatesLink = page.getByText('All States', { exact: true });
   await waitForElementReady(allStatesLink);
   await allStatesLink.click();
-  await waitForInteraction(); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready
   const searchStatesBox = page.getByRole('textbox', { name: 'Search States' });
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Indiana to appear and be clickable
   const indianaElement = page.getByText('Indiana').nth(1);
@@ -259,13 +276,13 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 7. Assign first LOA checkbox
   console.log('📋 Step 7: Assign first LOA checkbox');
-  await waitForInteraction(); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for first LOA checkbox to be ready
   const firstLOACheckbox = page.locator('span > .ant-checkbox-wrapper > .ant-checkbox > .ant-checkbox-input').first();
   await waitForElementReady(firstLOACheckbox);
   await firstLOACheckbox.check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready
   const saveChangesButton = page.getByRole('button', { name: 'Save Changes' });
@@ -275,19 +292,20 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 8. Verify initial assignment
   console.log('📋 Step 8: Verify initial assignment');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready
   const stateLicensesLink = page.getByText('State Licenses');
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await waitForInteraction(); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready
   const homeLink = page.getByText('Home');
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await waitForInteraction(); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('#ant-layout-container')).toContainText('IN'),
@@ -298,22 +316,23 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 9. Verify LOA assignment details
   console.log('📋 Step 9: Verify LOA assignment details');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await waitForInteraction(); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search licenses combobox to be ready
   const searchLicensesBox = page.getByRole('combobox', { name: 'Search Licenses by State,' });
   await waitForElementReady(searchLicensesBox);
   await searchLicensesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.press('Enter');
-  await waitForInteraction(); // Reduced from 1500ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.getByText('Producer - Individual (602)Accident & Health (14)Life (16)Personal lines (928)')).toBeVisible(),
@@ -339,54 +358,55 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 10. Unassign some LOAs and assign Personal lines
   console.log('📋 Step 10: Unassign some LOAs and assign Personal lines');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready again
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Indiana to appear and be clickable again
   await waitForElementReady(indianaElement);
   await indianaElement.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for LOA checkboxes to be ready
   const loaCheckboxes = page.locator('div').filter({ hasText: /^Accident & Health \(14\)Life, Accident & Health \(36\)Life \(16\)Personal lines \(928\)$/ }).getByLabel('');
   await waitForElementReady(loaCheckboxes.first());
   await loaCheckboxes.first().uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   await waitForElementReady(loaCheckboxes.nth(2));
   await loaCheckboxes.nth(2).uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for first LOA checkbox to be ready again
   await waitForElementReady(firstLOACheckbox);
   await firstLOACheckbox.uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await firstLOACheckbox.check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await firstLOACheckbox.uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Personal lines checkbox to be ready
   const personalLinesCheckbox = page.locator('div').filter({ hasText: /^Personal lines \(928\)$/ }).getByLabel('');
   await waitForElementReady(personalLinesCheckbox);
   await personalLinesCheckbox.check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
@@ -395,21 +415,22 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 11. Verify partial assignment
   console.log('📋 Step 11: Verify partial assignment');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search licenses combobox to be ready again
   await waitForElementReady(searchLicensesBox);
   await searchLicensesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.press('Enter');
-  await page.waitForTimeout(1500); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
@@ -433,35 +454,36 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 12. Assign Life LOA
   console.log('📋 Step 12: Assign Life LOA');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready again
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready again
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for INIndiana to appear and be clickable
   const inIndianaElement = page.getByText('INIndiana');
   await waitForElementReady(inIndianaElement);
   await inIndianaElement.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Life LOA checkbox to be ready
   await waitForElementReady(loaCheckboxes.nth(2));
   await loaCheckboxes.nth(2).check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
@@ -470,21 +492,22 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 13. Verify Life assignment
   console.log('📋 Step 13: Verify Life assignment');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search licenses combobox to be ready again
   await waitForElementReady(searchLicensesBox);
   await searchLicensesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.press('Enter');
-  await page.waitForTimeout(1500); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
@@ -510,41 +533,42 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 14. Assign Accident & Health LOA
   console.log('📋 Step 14: Assign Accident & Health LOA');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready again
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready again
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Indiana to appear and be clickable again
   await waitForElementReady(indianaElement);
   await indianaElement.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for first LOA checkbox to be ready again
   await waitForElementReady(firstLOACheckbox);
   await firstLOACheckbox.uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await firstLOACheckbox.check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Accident & Health LOA checkbox to be ready
   await waitForElementReady(loaCheckboxes.nth(1));
   await loaCheckboxes.nth(1).check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
@@ -553,21 +577,22 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 15. Verify final assignment
   console.log('📋 Step 15: Verify final assignment');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search licenses combobox to be ready again
   await waitForElementReady(searchLicensesBox);
   await searchLicensesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.press('Enter');
-  await page.waitForTimeout(1500); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
@@ -591,36 +616,37 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 16. Check Needs Attention tab
   console.log('📋 Step 16: Check Needs Attention tab');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready again
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready again
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Indiana to appear and be clickable again
   await waitForElementReady(indianaElement);
   await indianaElement.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for first LOA checkbox to be ready again
   await waitForElementReady(firstLOACheckbox);
   await firstLOACheckbox.uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await firstLOACheckbox.check();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
@@ -629,18 +655,19 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 17. Verify final state in Needs Attention
   console.log('📋 Step 17: Verify final state in Needs Attention');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Needs Attention button to be ready
   const needsAttentionButton = page.getByRole('button', { name: 'Needs Attention (0)' });
   await waitForElementReady(needsAttentionButton);
   await needsAttentionButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
@@ -666,34 +693,35 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 18. Unassign Indiana completely
   console.log('📋 Step 18: Unassign Indiana completely');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready again
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready again
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Indiana to appear and be clickable again
   await waitForElementReady(indianaElement);
   await indianaElement.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for LOA checkbox to be ready
   await waitForElementReady(loaCheckboxes.nth(2));
   await loaCheckboxes.nth(2).click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
@@ -702,25 +730,26 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 19. Verify no Indiana assignment
   console.log('📋 Step 19: Verify no Indiana assignment');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search licenses combobox to be ready again
   await waitForElementReady(searchLicensesBox);
   await searchLicensesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for "ind in: State" to appear and be clickable
   const indInStateElement = page.getByText('ind in: State');
   await waitForElementReady(indInStateElement);
   await indInStateElement.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
@@ -744,30 +773,31 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 20. Final cleanup and logout
   console.log('📋 Step 20: Final cleanup and logout');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for Home to be ready again
   await waitForElementReady(homeLink);
   await homeLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready again
   await waitForElementReady(searchStatesBox);
   await searchStatesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchStatesBox.fill('in');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for INIndiana checkbox to be ready
   const inIndianaCheckbox = page.locator('div').filter({ hasText: /^INIndiana$/ }).getByLabel('');
   await waitForElementReady(inIndianaCheckbox);
   await inIndianaCheckbox.uncheck();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
@@ -776,21 +806,22 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 21. Verify final state
   console.log('📋 Step 21: Verify final state');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for State Licenses to be ready again
   await waitForElementReady(stateLicensesLink);
   await stateLicensesLink.click();
-  await page.waitForTimeout(1000); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   // Wait for search licenses combobox to be ready again
   await waitForElementReady(searchLicensesBox);
   await searchLicensesBox.click();
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.fill('ind');
-  await waitForInteraction();
+  await page.waitForTimeout(1000);
   await searchLicensesBox.press('Enter');
-  await page.waitForTimeout(1500); // Reduced from 2000ms
+  await page.waitForTimeout(2000);
   
   await safeAssert(
     async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
@@ -812,7 +843,8 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   
   // 22. Logout
   console.log('📋 Step 22: Logout');
-  await waitForPageLoad();
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(2000);
   
   // Wait for EIP Test to be ready
   const eipTestElement = page.getByText('EIP Test');

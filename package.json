@@ -8,7 +8,7 @@
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug",
 
-    "test:hai-buchwalter": "npx playwright test tests/haiBuchwalterFlow.spec.ts --project=chromium --headed --timeout=120000 --reporter=html,list && npx playwright show-report",
+    "test:hai-buchwalter": "npx playwright test tests/haiBuchwalterFlow.spec.ts --project=chromium --headed --timeout=180000 --reporter=html,list && npx playwright show-report",
     "test:hai-buchwalter:headless": "npx playwright test tests/haiBuchwalterFlow.spec.ts --project=chromium --headed --timeout=120000 --reporter=html,list && npx playwright show-report",
     "test:all": "npx playwright test --project=chromium --headed --timeout=120000",
     "test:all:headless": "npx playwright test --project=chromium --timeout=120000",
