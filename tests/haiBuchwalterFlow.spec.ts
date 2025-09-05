@@ -241,15 +241,66 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
   // 5. Unassign existing Indiana assignment if present
   console.log('📋 Step 5: Unassign existing Indiana assignment if present');
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(5000);
   
+  // Wait for the specific card containers to be available (takes 5 seconds)
+  console.log('⏱️ Waiting for card containers to load...');
+  await page.waitForTimeout(5000);
+  
+  // Look for checkboxes in specific card containers and uncheck them
   try {
-    const existingAssignment = page.locator('div').filter({ hasText: /^Aug 26 - 2025$/ }).getByLabel('');
-    await waitForElementReady(existingAssignment);
-    await existingAssignment.uncheck();
-    console.log('✅ Step 5: Existing assignment unchecked');
+    // Target the specific card containers
+    const cardContainer1 = page.locator('#root > div > div > div > div > main > div.ant-card.ant-card-bordered.individual-onboard-assignment-card.figtree.mt-3.min-h-\\[470px\\].h-\\[calc\\(100vh-230px\\)\\].css-dev-only-do-not-override-1fvgrqi > div > div.flex.gap-\\[18px\\].overflow-y-auto > div:nth-child(1)');
+    const cardContainer2 = page.locator('#root > div > div > div > div > main > div.ant-card.ant-card-bordered.individual-onboard-assignment-card.figtree.mt-3.min-h-\\[470px\\].h-\\[calc\\(100vh-230px\\)\\].css-dev-only-do-not-override-1fvgrqi > div > div.flex.gap-\\[18px\\].overflow-y-auto > div:nth-child(2)');
+    
+    // Wait for the containers to be visible
+    await waitForElementReady(cardContainer1, 10000);
+    await waitForElementReady(cardContainer2, 10000);
+    console.log('✅ Card containers are now available');
+    
+    // Find all checked checkboxes within these containers
+    const checkboxesInContainer1 = cardContainer1.locator('input[type="checkbox"]:checked');
+    const checkboxesInContainer2 = cardContainer2.locator('input[type="checkbox"]:checked');
+    
+    const count1 = await checkboxesInContainer1.count();
+    const count2 = await checkboxesInContainer2.count();
+    const totalCount = count1 + count2;
+    
+    if (totalCount > 0) {
+      console.log(`🔍 Found ${count1} checked checkbox(es) in container 1 and ${count2} in container 2, unchecking them all...`);
+      
+      // Uncheck checkboxes in container 1
+      for (let i = 0; i < count1; i++) {
+        try {
+          const checkbox = checkboxesInContainer1.nth(i);
+          await waitForElementReady(checkbox, 3000);
+          await checkbox.uncheck();
+          console.log(`✅ Unchecked checkbox ${i + 1} in container 1`);
+        } catch (error: any) {
+          console.log(`⚠️ Could not uncheck checkbox ${i + 1} in container 1: ${error.message}`);
+          console.log('⏭️ Moving to next step...');
+          break; // Exit the loop and move to next step
+        }
+      }
+      
+      // Uncheck checkboxes in container 2
+      for (let i = 0; i < count2; i++) {
+        try {
+          const checkbox = checkboxesInContainer2.nth(i);
+          await waitForElementReady(checkbox, 3000);
+          await checkbox.uncheck();
+          console.log(`✅ Unchecked checkbox ${i + 1} in container 2`);
+        } catch (error: any) {
+          console.log(`⚠️ Could not uncheck checkbox ${i + 1} in container 2: ${error.message}`);
+          console.log('⏭️ Moving to next step...');
+          break; // Exit the loop and move to next step
+        }
+      }
+    } else {
+      console.log('ℹ️ No checked checkboxes found in the specified containers');
+    }
   } catch (error) {
-    console.log('ℹ️ Step 5: No existing assignment found to uncheck');
+    console.log('ℹ️ Step 5: No existing checkboxes found in the specified containers');
   }
   
   // 6. Open All States and search for Indiana
