@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
+test('Hai Buchwalter Scenario 3 - Indiana License Management Flow', async ({ page }) => {
   const testInfo = test.info();
   const startTime = new Date().toISOString();
   const assertionResults: Array<{step: string, description: string, passed: boolean, expected?: string, actual?: string, error?: string}> = [];
@@ -254,8 +254,8 @@ test('Hai Buchwalter - Indiana License Management Flow', async ({ page }) => {
     const cardContainer2 = page.locator('#root > div > div > div > div > main > div.ant-card.ant-card-bordered.individual-onboard-assignment-card.figtree.mt-3.min-h-\\[470px\\].h-\\[calc\\(100vh-230px\\)\\].css-dev-only-do-not-override-1fvgrqi > div > div.flex.gap-\\[18px\\].overflow-y-auto > div:nth-child(2)');
     
     // Wait for the containers to be visible
-    await waitForElementReady(cardContainer1, 10000);
-    await waitForElementReady(cardContainer2, 10000);
+    await waitForElementReady(cardContainer1, 5000);
+    await waitForElementReady(cardContainer2, 5000);
     console.log('✅ Card containers are now available');
     
     // Find all checked checkboxes within these containers

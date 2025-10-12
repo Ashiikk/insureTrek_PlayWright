@@ -1,11 +1,11 @@
-# Shemlah Scenario 4 - Indiana License Management Flow Test Cases
+# Shemlah Scenario 3 - Indiana License Management Flow Test Cases
 
 ## Overview
-This document outlines the comprehensive test cases for Shemlah Scenario 4, which tests the Indiana license management flow for the producer "Shemlah Naphish" in the InsureTrek application.
+This document outlines the comprehensive test cases for Shemlah Scenario 3, which tests the Indiana license management flow for the producer "Shemlah Naphish" in the InsureTrek application.
 
 ## Test Information
-- **Test File**: `tests/shemlahScenario4.spec.ts`
-- **Test Name**: "Shemlah Scenario 4 - Indiana License Management Flow"
+- **Test File**: `tests/shemlahScenario3.spec.ts`
+- **Test Name**: "Shemlah Scenario 3 - Indiana License Management Flow"
 - **Producer**: Shemlah Naphish
 - **State**: Indiana (IN)
 - **Duration**: ~5 minutes (300 seconds timeout)

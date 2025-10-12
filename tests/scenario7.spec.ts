@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) => {
+test('Scenario 7 - Brian Moltz Indiana License Management Flow', async ({ page }) => {
   const testInfo = test.info();
   const startTime = new Date().toISOString();
   const assertionResults: Array<{step: string, description: string, passed: boolean, expected?: string, actual?: string, error?: string}> = [];
@@ -96,7 +96,7 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
     await page.waitForTimeout(500);
   };
 
-  console.log('🚀 Starting Shemlah Scenario 3 - Indiana License Management Flow');
+  console.log('🚀 Starting Scenario 7 - Brian Moltz Indiana License Management Flow');
   
   // Dynamically detect screen size and set optimal viewport ratio
   console.log('🖥️ Step 0: Detecting screen size and setting optimal viewport ratio...');
@@ -166,8 +166,8 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await manageProducersLink.click();
   console.log('✅ Step 2: Navigated to Manage Producers');
 
-  // 3. Search and select Shemlah Naphish
-  console.log('📋 Step 3: Search for Shemlah Naphish');
+  // 3. Search and select Brian Moltz
+  console.log('📋 Step 3: Search for Brian Moltz');
   await waitForPageLoad();
   
   // Wait for search combobox to be ready
@@ -175,16 +175,16 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await waitForElementReady(searchCombobox);
   await searchCombobox.click();
   await waitForInteraction();
-  await searchCombobox.fill('Shemlah');
+  await searchCombobox.fill('Brian');
   await waitForInteraction();
   await searchCombobox.press('Enter');
   await page.waitForTimeout(2000);
   
-  // Wait for Shemlah Naphish to appear and be clickable
-  const shemlahElement = page.getByText('Shemlah Naphish');
-  await waitForElementReady(shemlahElement);
-  await shemlahElement.click();
-  console.log('✅ Step 3: Shemlah Naphish selected');
+  // Wait for Brian Moltz to appear and be clickable
+  const brianElement = page.getByText('Brian Moltz');
+  await waitForElementReady(brianElement);
+  await brianElement.click();
+  console.log('✅ Step 3: Brian Moltz selected');
 
   // 4. Click Manage button
   console.log('📋 Step 4: Click Manage button');
@@ -196,10 +196,22 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await manageButton.click();
   console.log('✅ Step 4: Manage button clicked');
   
-  // 5. Unassign existing assignments if present
-  console.log('📋 Step 5: Unassign existing assignments if present');
+  // 5. Click "All States" before unassigning existing assignments
+  console.log('📋 Step 5: Click "All States" before unassigning existing assignments');
   await waitForPageLoad();
   await page.waitForTimeout(5000);
+  
+  // Click on "All States" first
+  try {
+    const allStatesElement = page.getByText('All States');
+    await waitForElementReady(allStatesElement, 5000);
+    await allStatesElement.click();
+    console.log('✅ Clicked on "All States"');
+    await waitForInteraction();
+  } catch (error: any) {
+    console.log(`⚠️ Could not find "All States" element: ${error.message}`);
+    console.log('⏭️ Continuing with existing assignment cleanup...');
+  }
   
   // Wait for the specific card containers to be available (takes 5 seconds)
   console.log('⏱️ Waiting for card containers to load...');
@@ -215,6 +227,18 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
     await waitForElementReady(cardContainer1, 5000);
     await waitForElementReady(cardContainer2, 5000);
     console.log('✅ Card containers are now available');
+    
+    // Click "All States" before checking cardContainer2
+    try {
+      const allStatesElement = page.getByText('All States');
+      await waitForElementReady(allStatesElement, 3000);
+      await allStatesElement.click();
+      console.log('✅ Clicked on "All States" before checking cardContainer2');
+      await waitForInteraction();
+    } catch (error: any) {
+      console.log(`⚠️ Could not find "All States" element before cardContainer2: ${error.message}`);
+      console.log('⏭️ Continuing with cardContainer2 operations...');
+    }
     
     // Find all checked checkboxes within these containers
     const checkboxesInContainer1 = cardContainer1.locator('input[type="checkbox"]:checked');
@@ -261,8 +285,9 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
     console.log('ℹ️ Step 5: No existing checkboxes found in the specified containers');
   }
 
-  // 6. Search for Indiana and assign first LOA
-  console.log('📋 Step 6: Search for Indiana and assign first LOA');
+  // 6. Search for Indiana and manage LOA assignments
+  console.log('📋 Step 6: Search for Indiana and manage LOA assignments');
+  await waitForPageLoad();
   await page.waitForTimeout(2000);
   
   // Wait for search states textbox to be ready
@@ -279,20 +304,94 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await indianaElement.click();
   console.log('✅ Step 6: Indiana state selected');
   
-  // Wait for first LOA checkbox to be ready
+  // Wait for first LOA checkbox to be ready and check it
   const firstLOACheckbox = page.locator('span > .ant-checkbox-wrapper > .ant-checkbox > .ant-checkbox-input').first();
   await waitForElementReady(firstLOACheckbox);
   await firstLOACheckbox.check();
   await waitForInteraction();
   
+  // Uncheck "States All States Territories" checkbox
+  try {
+    const allStatesCheckbox = page.locator('div').filter({ hasText: /^States All States Territories$/ }).getByLabel('', { exact: true });
+    if (await allStatesCheckbox.isVisible()) {
+      await waitForElementReady(allStatesCheckbox);
+      await allStatesCheckbox.uncheck();
+      console.log('✅ Unchecked States All States Territories checkbox');
+      await waitForInteraction();
+    }
+  } catch (error: any) {
+    console.log(`⚠️ Could not find States All States Territories checkbox: ${error.message}`);
+  }
+  
+  // Uncheck second checkbox
+  try {
+    const secondCheckbox = page.locator('div:nth-child(2) > .flex.items-center.cursor-pointer > .ant-checkbox-wrapper > .ant-checkbox > .ant-checkbox-input');
+    if (await secondCheckbox.isVisible()) {
+      await waitForElementReady(secondCheckbox);
+      await secondCheckbox.uncheck();
+      console.log('✅ Unchecked second checkbox');
+      await waitForInteraction();
+    }
+  } catch (error: any) {
+    console.log(`⚠️ Could not find second checkbox: ${error.message}`);
+  }
+  
   // Wait for Save Changes button to be ready
   const saveChangesButton = page.getByRole('button', { name: 'Save Changes' });
   await waitForElementReady(saveChangesButton);
   await saveChangesButton.click();
-  console.log('✅ Step 6: First LOA assigned and saved');
+  console.log('✅ Step 6: Initial LOA assignments saved');
 
-  // 7. Verify initial assignment
-  console.log('📋 Step 7: Verify initial assignment');
+  // 7. Modify LOA assignments
+  console.log('📋 Step 7: Modify LOA assignments');
+  await waitForPageLoad();
+  
+  // Wait for Manage button to be ready again
+  await waitForElementReady(manageButton);
+  await manageButton.click();
+  await waitForInteraction();
+  
+  // Wait for search states textbox to be ready again
+  await waitForElementReady(searchStatesBox);
+  await searchStatesBox.click();
+  await waitForInteraction();
+  await searchStatesBox.fill('ind');
+  await waitForInteraction();
+  
+  // Wait for Indiana to appear and be clickable again
+  await waitForElementReady(indianaElement);
+  await indianaElement.click();
+  await waitForInteraction();
+  
+  // Check Personal lines checkbox
+  try {
+    const personalLinesCheckbox = page.locator('div').filter({ hasText: /^Personal lines \(928\)$/ }).getByLabel('');
+    if (await personalLinesCheckbox.isVisible()) {
+      await waitForElementReady(personalLinesCheckbox);
+      await personalLinesCheckbox.check();
+      console.log('✅ Checked Personal lines checkbox');
+      await waitForInteraction();
+    }
+  } catch (error: any) {
+    console.log(`⚠️ Could not find Personal lines checkbox: ${error.message}`);
+  }
+  
+  // Uncheck and double-click first LOA checkbox
+  await waitForElementReady(firstLOACheckbox);
+  await firstLOACheckbox.uncheck();
+  await waitForInteraction();
+  await firstLOACheckbox.dblclick();
+  await waitForInteraction();
+  await firstLOACheckbox.check();
+  await waitForInteraction();
+  
+  // Wait for Save Changes button to be ready again
+  await waitForElementReady(saveChangesButton);
+  await saveChangesButton.click();
+  console.log('✅ Step 7: LOA assignments modified and saved');
+
+  // 8. Verify assignment and check Needs Attention
+  console.log('📋 Step 8: Verify assignment and check Needs Attention');
   await waitForPageLoad();
   
   // Wait for State Licenses to be ready
@@ -311,17 +410,51 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await searchLicensesBox.press('Enter');
   await page.waitForTimeout(2000);
   
+  // Check for presence of required elements without strict order
   await safeAssert(
-    async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
-      - img "activeLoa"
-      - text: /Life, Accident & Health \\(\\d+\\)/
-      - img "nonActiveLoa"
-      - text: /Personal lines \\(\\d+\\)/
-    `),
-    'Step 7a',
-    'Aria snapshot matches initial assignment structure',
-    'Aria snapshot should show Life, Accident & Health as active and Personal lines as non-active'
+    async () => {
+      const tbody = page.locator('tbody');
+      await expect(tbody).toContainText(/Personal lines \(\d+\)/);
+      await expect(tbody).toContainText(/Producer - Individual \(\d+\)/);
+      // Check for active LOA images
+      const activeLoaImages = tbody.locator('img[alt="activeLoa"]');
+      await expect(activeLoaImages).toHaveCount(1);
+    },
+    'Step 8a',
+    'Assignment structure verified',
+    'Table should contain Personal lines (active) and Producer - Individual'
   );
+  
+  // Check Needs Attention tab
+  try {
+    const needsAttentionButton = page.getByRole('button', { name: /Needs Attention/ });
+    await waitForElementReady(needsAttentionButton, 5000);
+    await needsAttentionButton.click();
+    await page.waitForTimeout(2000);
+    console.log('✅ Step 8: Needs Attention button clicked');
+    
+    // Check for Missing LOA indicator or No data
+    await safeAssert(
+      async () => {
+        const tbody = page.locator('tbody');
+        const hasMissingLoa = await tbody.textContent();
+        if (hasMissingLoa && hasMissingLoa.includes('Missing LOA')) {
+          await expect(tbody).toContainText('Missing LOA');
+        } else {
+          await expect(tbody).toContainText('No data');
+        }
+      },
+      'Step 8b',
+      'Needs Attention tab content verified',
+      'Needs Attention tab should show "Missing LOA" or "No data"'
+    );
+  } catch (error) {
+    console.log('⚠️ Needs Attention button not found, skipping this step...');
+  }
+
+  // 9. Continue with additional LOA modifications
+  console.log('📋 Step 9: Continue with additional LOA modifications');
+  await waitForPageLoad();
   
   // Wait for Home to be ready
   const homeLink = page.getByText('Home');
@@ -329,96 +462,6 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await homeLink.click();
   await waitForInteraction();
   
-  await safeAssert(
-    async () => await expect(page.locator('#ant-layout-container')).toContainText('IN'),
-    'Step 7b',
-    'IN text found in container',
-    'Container should contain "IN" text'
-  );
-
-  // 8. Modify LOA assignments
-  console.log('📋 Step 8: Modify LOA assignments');
-  await waitForPageLoad();
-  
-  // Wait for Manage button to be ready again
-  await waitForElementReady(manageButton);
-  await manageButton.click();
-  await waitForInteraction();
-  
-  // Wait for search states textbox to be ready again
-  await waitForElementReady(searchStatesBox);
-  await searchStatesBox.click();
-  await waitForInteraction();
-  await searchStatesBox.fill('ind');
-  await waitForInteraction();
-  
-  // Wait for INIndiana to appear and be clickable
-  const inIndianaElement = page.getByText('INIndiana');
-  await waitForElementReady(inIndianaElement);
-  await inIndianaElement.click();
-  await waitForInteraction();
-  
-  // Wait for LOA checkboxes to be ready
-  const loaCheckboxes = page.locator('div').filter({ hasText: /^Accident & Health \(14\)Life, Accident & Health \(36\)Life \(16\)Personal lines \(928\)$/ }).getByLabel('');
-  await waitForElementReady(loaCheckboxes.nth(1));
-  await loaCheckboxes.nth(1).uncheck();
-  await waitForInteraction();
-  
-  await waitForElementReady(loaCheckboxes.nth(2));
-  await loaCheckboxes.nth(2).check();
-  await waitForInteraction();
-  
-  // Wait for Save Changes button to be ready again
-  await waitForElementReady(saveChangesButton);
-  await saveChangesButton.click();
-  console.log('✅ Step 8: LOA assignments modified and saved');
-  
-  await safeAssert(
-    async () => await expect(page.locator('#ant-layout-container')).toContainText('IN'),
-    'Step 8a',
-    'IN text still present after modification',
-    'Container should still contain "IN" text'
-  );
-
-  // 9. Verify modified assignment
-  console.log('📋 Step 9: Verify modified assignment');
-  await waitForPageLoad();
-  
-  // Wait for State Licenses to be ready again
-  await waitForElementReady(stateLicensesLink);
-  await stateLicensesLink.click();
-  await waitForInteraction();
-  
-  // Wait for search licenses combobox to be ready again
-  await waitForElementReady(searchLicensesBox);
-  await searchLicensesBox.click();
-  await waitForInteraction();
-  await searchLicensesBox.fill('ind');
-  await waitForInteraction();
-  await searchLicensesBox.press('Enter');
-  await page.waitForTimeout(2000);
-  
-  await safeAssert(
-    async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
-      - img "nonActiveLoa"
-      - text: /Personal lines \\(\\d+\\)/
-      - img "activeLoa"
-      - text: /Life, Accident & Health \\(\\d+\\)/
-    `),
-    'Step 9a',
-    'Aria snapshot matches modified assignment structure',
-    'Aria snapshot should show Personal lines as non-active and Life, Accident & Health as active'
-  );
-
-  // 10. Further LOA modifications
-  console.log('📋 Step 10: Further LOA modifications');
-  await waitForPageLoad();
-  
-  // Wait for Home to be ready again
-  await waitForElementReady(homeLink);
-  await homeLink.click();
-  await waitForInteraction();
-  
   // Wait for Manage button to be ready again
   await waitForElementReady(manageButton);
   await manageButton.click();
@@ -436,121 +479,31 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await indianaElement.click();
   await waitForInteraction();
   
-  // Wait for LOA checkbox to be ready
-  await waitForElementReady(loaCheckboxes.nth(1));
-  await loaCheckboxes.nth(1).uncheck();
-  await waitForInteraction();
-  
-  // Wait for Save Changes button to be ready again
-  await waitForElementReady(saveChangesButton);
-  await saveChangesButton.click();
-  console.log('✅ Step 10: Further LOA modifications saved');
-
-  // 11. Check Needs Attention tab
-  console.log('📋 Step 11: Check Needs Attention tab');
-  await waitForPageLoad();
-  
-  // Wait for State Licenses to be ready again
-  await waitForElementReady(stateLicensesLink);
-  await stateLicensesLink.click();
-  await waitForInteraction();
-  
-  // Wait for Needs Attention button to be ready - click any button containing "Needs Attention"
-  try {
-    const needsAttentionButton = page.getByRole('button', { name: /Needs Attention/ });
-    await waitForElementReady(needsAttentionButton, 5000);
-    await needsAttentionButton.click();
-    await page.waitForTimeout(2000);
-    console.log('✅ Step 11: Needs Attention button clicked');
-  } catch (error) {
-    console.log('⚠️ Needs Attention button not found, skipping this step...');
-  }
-  
-  // Try to run assertions if Needs Attention button was clicked
-  try {
-    await safeAssert(
-      async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
-        - img "nonActiveLoa"
-        - text: /Personal lines \\(\\d+\\)/
-        - img "activeLoa"
-        - text: /Life, Accident & Health \\(\\d+\\)/
-      `),
-      'Step 11a',
-      'Aria snapshot matches Needs Attention structure',
-      'Aria snapshot should show the structure in Needs Attention tab'
-    );
-  } catch (error) {
-    console.log('⏭️ Step 11 assertions: Skipped - Needs Attention button not available or assertions failed');
-  }
-  
-  // Navigate to Home page before checking for IN text
-  await waitForElementReady(homeLink);
-  await homeLink.click();
-  await waitForInteraction();
-  
-  // Wait for home page to load completely before checking for IN text
-  await waitForPageLoad();
-  await page.waitForTimeout(2000);
-  
-  await safeAssert(
-    async () => await expect(page.locator('#ant-layout-container')).toContainText('IN'),
-    'Step 11b',
-    'IN text still present',
-    'Container should still contain "IN" text'
-  );
-
-  // 12. Unassign Indiana completely
-  console.log('📋 Step 12: Unassign Indiana completely');
-  await waitForPageLoad();
-  
-  // Wait for Home to be ready again
-  await waitForElementReady(homeLink);
-  await homeLink.click();
-  await waitForInteraction();
-  
-  // Wait for Manage button to be ready again
-  await waitForElementReady(manageButton);
-  await manageButton.click();
-  await waitForInteraction();
-  
-  // Wait for search states textbox to be ready again
-  await waitForElementReady(searchStatesBox);
-  await searchStatesBox.click();
-  await waitForInteraction();
-  await searchStatesBox.fill('ind');
-  await waitForInteraction();
-  
-  // Wait for INIndiana to appear and be clickable
-  await waitForElementReady(inIndianaElement);
-  await inIndianaElement.click();
-  await waitForInteraction();
-  
-  // Wait for first LOA checkbox to be ready
+  // Uncheck first LOA checkbox
   await waitForElementReady(firstLOACheckbox);
   await firstLOACheckbox.uncheck();
   await waitForInteraction();
   
+  // Click Personal lines label
+  try {
+    const personalLinesLabel = page.locator('div').filter({ hasText: /^Personal lines \(928\)$/ }).locator('label');
+    if (await personalLinesLabel.isVisible()) {
+      await waitForElementReady(personalLinesLabel);
+      await personalLinesLabel.click();
+      console.log('✅ Clicked Personal lines label');
+      await waitForInteraction();
+    }
+  } catch (error: any) {
+    console.log(`⚠️ Could not find Personal lines label: ${error.message}`);
+  }
+  
   // Wait for Save Changes button to be ready again
   await waitForElementReady(saveChangesButton);
   await saveChangesButton.click();
-  console.log('✅ Step 12: Indiana completely unassigned');
-  
-  await safeAssert(
-    async () => await expect(page.locator('#ant-layout-container')).toContainText('No Territories Assigned'),
-    'Step 12a',
-    'No Territories Assigned text found',
-    'Container should contain "No Territories Assigned" text'
-  );
-  
-  await safeAssert(
-    async () => await expect(page.locator('#ant-layout-container')).toContainText('No States Assigned'),
-    'Step 12b',
-    'No States Assigned text found',
-    'Container should contain "No States Assigned" text'
-  );
+  console.log('✅ Step 9: Additional LOA modifications saved');
 
-  // 13. Verify unassignment
-  console.log('📋 Step 13: Verify unassignment');
+  // 10. Final verification and cleanup
+  console.log('📋 Step 10: Final verification and cleanup');
   await waitForPageLoad();
   
   // Wait for State Licenses to be ready again
@@ -567,141 +520,23 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   await searchLicensesBox.press('Enter');
   await page.waitForTimeout(2000);
   
+  // Check for presence of required elements without strict order
   await safeAssert(
-    async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
-      - img "activeLoa"
-      - text: /Life, Accident & Health \\(\\d+\\)/
-    `),
-    'Step 13a',
-    'Aria snapshot matches unassigned structure',
-    'Aria snapshot should show only Life, Accident & Health as active'
+    async () => {
+      const tbody = page.locator('tbody');
+      await expect(tbody).toContainText(/Personal lines \(\d+\)/);
+      await expect(tbody).toContainText(/Producer - Individual \(\d+\)/);
+      // Check for active LOA images
+      const activeLoaImages = tbody.locator('img[alt="activeLoa"]');
+      await expect(activeLoaImages).toHaveCount(1);
+    },
+    'Step 10a',
+    'Final assignment structure verified',
+    'Table should contain Personal lines (active) and Producer - Individual'
   );
 
-  // 14. Reassign Indiana
-  console.log('📋 Step 14: Reassign Indiana');
-  await waitForPageLoad();
-  
-  // Wait for Home to be ready again
-  await waitForElementReady(homeLink);
-  await homeLink.click();
-  await waitForInteraction();
-  
-  // Wait for Manage button to be ready again
-  await waitForElementReady(manageButton);
-  await manageButton.click();
-  await waitForInteraction();
-  
-  // Wait for search states textbox to be ready again
-  await waitForElementReady(searchStatesBox);
-  await searchStatesBox.click();
-  await waitForInteraction();
-  await searchStatesBox.fill('ind');
-  await waitForInteraction();
-  
-  // Wait for Indiana checkbox to be ready
-  const indianaCheckbox = page.locator('div:nth-child(2) > .flex.items-center.cursor-pointer > .ant-checkbox-wrapper > .ant-checkbox > .ant-checkbox-input');
-  await waitForElementReady(indianaCheckbox);
-  await indianaCheckbox.check();
-  await waitForInteraction();
-  
-  // Wait for first LOA checkbox to be ready
-  await waitForElementReady(firstLOACheckbox);
-  await firstLOACheckbox.check();
-  await waitForInteraction();
-  
-  // Wait for Save Changes button to be ready again
-  await waitForElementReady(saveChangesButton);
-  await saveChangesButton.click();
-  console.log('✅ Step 14: Indiana reassigned');
-
-  // 15. Verify reassignment
-  console.log('📋 Step 15: Verify reassignment');
-  await waitForPageLoad();
-  
-  // Wait for State Licenses to be ready again
-  await waitForElementReady(stateLicensesLink);
-  await stateLicensesLink.click();
-  await waitForInteraction();
-  
-  // Wait for search licenses combobox to be ready again
-  await waitForElementReady(searchLicensesBox);
-  await searchLicensesBox.click();
-  await waitForInteraction();
-  await searchLicensesBox.fill('ind');
-  await waitForInteraction();
-  
-  // Click on the first option in the dropdown
-  const firstOption = page.locator('.ant-select-item-option-content').first();
-  await waitForElementReady(firstOption);
-  await firstOption.click();
-  await waitForInteraction();
-  
-  await safeAssert(
-    async () => await expect(page.locator('tbody')).toMatchAriaSnapshot(`
-      - img "activeLoa"
-      - text: /Life, Accident & Health \\(\\d+\\)/
-      - img "nonActiveLoa"
-      - text: /Personal lines \\(\\d+\\)/
-    `),
-    'Step 15a',
-    'Aria snapshot matches reassignment structure',
-    'Aria snapshot should show Life, Accident & Health as active and Personal lines as non-active'
-  );
-  
-  // Navigate to Home page before checking for IN text
-  await waitForElementReady(homeLink);
-  await homeLink.click();
-  await waitForInteraction();
-  
-  // Wait for home page to load completely before checking for IN text
-  await waitForPageLoad();
-  await page.waitForTimeout(2000);
-  
-  await safeAssert(
-    async () => await expect(page.locator('#ant-layout-container')).toContainText('IN'),
-    'Step 15b',
-    'IN text found after reassignment',
-    'Container should contain "IN" text'
-  );
-
-  // 16. Final unassignment
-  console.log('📋 Step 16: Final unassignment');
-  await waitForPageLoad();
-  
-  // Wait for Home to be ready again
-  await waitForElementReady(homeLink);
-  await homeLink.click();
-  await waitForInteraction();
-  
-  // Wait for Manage button to be ready again
-  await waitForElementReady(manageButton);
-  await manageButton.click();
-  await waitForInteraction();
-  
-  // Wait for search states textbox to be ready again
-  await waitForElementReady(searchStatesBox);
-  await searchStatesBox.click();
-  await waitForInteraction();
-  await searchStatesBox.fill('ind');
-  await waitForInteraction();
-  
-  // Wait for Indiana to appear and be clickable again
-  await waitForElementReady(indianaElement);
-  await indianaElement.click();
-  await waitForInteraction();
-  
-  // Wait for first LOA checkbox to be ready
-  await waitForElementReady(firstLOACheckbox);
-  await firstLOACheckbox.uncheck();
-  await waitForInteraction();
-  
-  // Wait for Save Changes button to be ready again
-  await waitForElementReady(saveChangesButton);
-  await saveChangesButton.click();
-  console.log('✅ Step 16: Final unassignment completed');
-
-  // 17. Logout
-  console.log('📋 Step 17: Logout');
+  // 11. Logout
+  console.log('📋 Step 11: Logout');
   await waitForPageLoad();
   
   // Wait for EIP Test to be ready
@@ -720,7 +555,7 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   const yesButton = page.getByRole('button', { name: 'Yes' });
   await waitForElementReady(yesButton);
   await yesButton.click();
-  console.log('✅ Step 17: Logout successful');
+  console.log('✅ Step 11: Logout successful');
   
   // Final summary and reporting
   const passedAssertions = assertionResults.filter(r => r.passed).length;
@@ -756,7 +591,7 @@ test('Shemlah Scenario 4 - Indiana License Management Flow', async ({ page }) =>
   testInfo.annotations.push({ type: 'test-completion', description: `Test completed at ${endTime}` });
   testInfo.annotations.push({ type: 'test-duration', description: `Total duration: ${duration}ms` });
   testInfo.annotations.push({ type: 'test-status', description: `Assertions: ${passedAssertions}/${totalAssertions} passed` });
-  testInfo.annotations.push({ type: 'test-summary', description: 'Shemlah Scenario 3 Indiana license management flow completed' });
+  testInfo.annotations.push({ type: 'test-summary', description: 'Scenario 7 Brian Moltz Indiana license management flow completed' });
   
   // Add detailed assertion results to test info for HTML report
   testInfo.annotations.push({ 
